@@ -28,6 +28,8 @@ async def upload_file(
     - **visibility**: File visibility level (PRIVATE/DEPARTMENT/PUBLIC)
     
     File size and type restrictions apply based on user role.
+    USER role can only create PRIVATE files.
+    MANAGER and ADMIN roles can create files with any visibility level.
     """
     # Check file size based on user role
     max_size = settings.MAX_FILE_SIZE_USER
@@ -42,16 +44,28 @@ async def upload_file(
             detail=f"File size exceeds maximum allowed size for your role"
         )
     
-    # Check file type for USER role
+    # Check file type based on user role
+    file_extension = os.path.splitext(file.filename)[1].lower()
     if current_user.role == UserRole.USER:
-        file_extension = os.path.splitext(file.filename)[1].lower()
         if file_extension not in settings.ALLOWED_FILE_TYPES_USER:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"File type {file_extension} not allowed for USER role"
             )
+    elif current_user.role == UserRole.MANAGER:
+        if file_extension not in settings.ALLOWED_FILE_TYPES_MANAGER:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"File type {file_extension} not allowed for MANAGER role"
+            )
+    elif current_user.role == UserRole.ADMIN:
+        if file_extension not in settings.ALLOWED_FILE_TYPES_ADMIN:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"File type {file_extension} not allowed for ADMIN role"
+            )
     
-    # Check visibility restrictions for USER role
+    # Check visibility restrictions - only USER role is restricted to PRIVATE
     if current_user.role == UserRole.USER and visibility != FileVisibility.PRIVATE:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

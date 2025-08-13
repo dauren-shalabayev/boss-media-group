@@ -13,7 +13,9 @@ class Settings:
     MAX_FILE_SIZE_MANAGER: int = 50 * 1024 * 1024  # 50MB
     MAX_FILE_SIZE_ADMIN: int = 100 * 1024 * 1024  # 100MB
     
-    # Allowed file types for USER role
+    # Allowed file types for different roles
     ALLOWED_FILE_TYPES_USER = [".pdf"]
+    ALLOWED_FILE_TYPES_MANAGER = [".pdf", ".doc", ".docx", ".txt", ".jpg", ".jpeg", ".png", ".gif", ".zip", ".rar"]
+    ALLOWED_FILE_TYPES_ADMIN = [".pdf", ".doc", ".docx", ".txt", ".jpg", ".jpeg", ".png", ".gif", ".zip", ".rar", ".xls", ".xlsx", ".ppt", ".pptx"]
 
 settings = Settings() 
